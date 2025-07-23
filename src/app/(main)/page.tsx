@@ -1,21 +1,15 @@
-import { CallToAction } from '@/components/CallToAction'
-import { Faqs } from '@/components/Faqs'
-import { Hero } from '@/components/Hero'
-import { Pricing } from '@/components/Pricing'
-import { PrimaryFeatures } from '@/components/PrimaryFeatures'
+import { JetLuxHero } from '@/components/JetLuxHero'
+import { Hosts } from '@/components/Hosts'
 import { Reviews } from '@/components/Reviews'
-import { SecondaryFeatures } from '@/components/SecondaryFeatures'
+import { ContactBanner } from '@/components/ContactBanner'
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <PrimaryFeatures />
-      <SecondaryFeatures />
-      <CallToAction />
+      <JetLuxHero />
+      <Hosts />
       <Reviews />
-      <Pricing />
-      <Faqs />
+      <ContactBanner />
     </>
   )
 }
