@@ -41,17 +41,28 @@
   --radius-4xl: 2rem;
   --radius-5xl: 2.5rem;
 
-  --color-gray-50: oklch(0.985 0 0);
-  --color-gray-100: oklch(0.97 0 0);
-  --color-gray-200: oklch(0.922 0 0);
-  --color-gray-300: oklch(0.87 0 0);
-  --color-gray-400: oklch(0.708 0 0);
-  --color-gray-500: oklch(0.556 0 0);
-  --color-gray-600: oklch(0.439 0 0);
-  --color-gray-700: oklch(0.371 0 0);
-  --color-gray-800: oklch(0.269 0 0);
-  --color-gray-900: oklch(0.205 0 0);
-  --color-gray-950: oklch(0.145 0 0);
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+  --color-gray-950: #0b1120;
+  --color-cyan-50: #fffbeb;
+  --color-cyan-100: #fef3c7;
+  --color-cyan-200: #fde68a;
+  --color-cyan-300: #fcd34d;
+  --color-cyan-400: #fbbf24;
+  --color-cyan-500: #f59e0b;
+  --color-cyan-600: #d97706;
+  --color-cyan-700: #b45309;
+  --color-cyan-800: #92400e;
+  --color-cyan-900: #78350f;
+  --color-cyan-950: #451a03;
 
   --font-sans: var(--font-inter);
 
