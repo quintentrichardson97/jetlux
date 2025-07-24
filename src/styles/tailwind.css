@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-
 @plugin '@tailwindcss/forms';
 
 @theme {
@@ -52,6 +51,7 @@
   --color-gray-800: #1c222b;
   --color-gray-900: #0c111a;
   --color-gray-950: #05080e;
+
   --color-cyan-50: #fffbea;
   --color-cyan-100: #fdf2c1;
   --color-cyan-200: #fce69a;
@@ -65,7 +65,6 @@
   --color-cyan-950: #402304;
 
   --font-sans: var(--font-inter);
-
   --container-2xl: 40rem;
 
   @keyframes fade-in {
@@ -76,6 +75,7 @@
       opacity: 1;
     }
   }
+
   @keyframes spin-reverse {
     to {
       transform: rotate(-360deg);
@@ -92,3 +92,4 @@
     }
   }
 }
+

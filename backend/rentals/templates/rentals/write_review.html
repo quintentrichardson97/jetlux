@@ -1,0 +1,12 @@
+{% extends "rentals/base.html" %}
+
+{% block content %}
+  <div class="max-w-2xl mx-auto mt-12 p-6 bg-charcoal rounded text-white">
+    <h2 class="text-2xl font-heading mb-4">Leave a Review</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="mt-4 bg-gold text-black px-4 py-2 rounded hover:bg-yellow-400">Submit Review</button>
+    </form>
+  </div>
+{% endblock %}

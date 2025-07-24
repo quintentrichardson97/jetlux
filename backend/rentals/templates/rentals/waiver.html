@@ -1,0 +1,88 @@
+{% extends 'rentals/base.html' %}
+{% block title %}Jet Ski Rental Waiver{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white text-gray-900 shadow-md rounded-lg p-6 sm:p-10 mt-10">
+  <h2 class="text-2xl sm:text-3xl font-bold text-deepnavy mb-6">Jet Ski Rental Waiver and Release of Liability</h2>
+
+  <p class="mb-4">
+    <strong>Charlie’s Jet Ski Rentals</strong><br>
+    <span class="text-sm text-gray-600">
+      charliesjetskirentals.com<br>
+      Email: charles.giet@charliesjetskirentals.com<br>
+      Phone: (813) 444-3746
+    </span>
+  </p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-2">Waiver and Release of Liability Agreement</h3>
+  <p class="mb-4 font-medium text-red-600">PLEASE READ CAREFULLY BEFORE AGREEING</p>
+
+  <p class="mb-6">By using Charlie’s Jet Ski Rentals (“Company”), I, the undersigned, agree to the following terms:</p>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">1. Acknowledgment of Risks</h3>
+  <ul class="list-disc list-inside mb-6">
+    <li>Drowning</li>
+    <li>Collisions with vessels or objects</li>
+    <li>Exposure to the elements</li>
+    <li>Equipment malfunction</li>
+    <li>Bodily injury or death</li>
+  </ul>
+  <p class="mb-6">I voluntarily assume all risks associated with jet ski or related services.</p>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">2. Release of Liability</h3>
+  <p class="mb-6">
+    I release and hold harmless Charlie’s Jet Ski Rentals, its owners, affiliates, and staff from any and all claims, liabilities, or damages related to my use of services, equipment, or watercraft provided or coordinated by the Company.
+  </p>
+
+  {% if is_affiliate %}
+    <h3 class="text-lg font-semibold mt-6 mb-2">3. Affiliate Terms</h3>
+    <p class="mb-2">I understand and agree that:</p>
+    <ul class="list-disc list-inside mb-6">
+      <li>The Company retains 33% of all rental payments and tips processed through the platform</li>
+      <li>I am solely responsible for the maintenance, gas, safety, and insurance of any watercraft I rent out</li>
+      <li>I assume full liability for any damage, loss, or legal claims related to my rentals</li>
+    </ul>
+
+  {% elif is_ski_buddy %}
+    <h3 class="text-lg font-semibold mt-6 mb-2">3. Ski Buddy Terms</h3>
+    <p class="mb-2">I understand and agree that:</p>
+    <ul class="list-disc list-inside mb-6">
+      <li>I will be compensated 50% of each completed ski buddy session booked through the site</li>
+      <li>I must follow all safety laws while accompanying renters</li>
+      <li>I am responsible for my conduct and safety during appointments</li>
+    </ul>
+
+  {% else %}
+    <h3 class="text-lg font-semibold mt-6 mb-2">3. Renter Terms</h3>
+    <p class="mb-2">I understand and agree that:</p>
+    <ul class="list-disc list-inside mb-6">
+      <li>I must upload pre- and post-rental photos of the jet ski</li>
+      <li>I am responsible for fuel, timely return, and any damage during my rental period</li>
+      <li>I must adhere to all instructions and safety rules</li>
+    </ul>
+  {% endif %}
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">4. Compliance and Conduct</h3>
+  <ul class="list-disc list-inside mb-6">
+    <li>I am at least 18 years old and possess valid ID</li>
+    <li>I understand Florida law requires a Boating Safety ID if born after Jan 1, 1988</li>
+    <li>I will not operate or participate under the influence of drugs or alcohol</li>
+    <li>I will comply with all state and federal boating safety laws</li>
+  </ul>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">5. Legal Jurisdiction</h3>
+  <p class="mb-6">This agreement is governed by the laws of the State of Florida. Any disputes will be handled in Florida courts.</p>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">Acknowledgment</h3>
+  <p class="mb-6">
+    By clicking “I Agree & Continue,” I acknowledge I have read and understood the terms based on my role, and I voluntarily accept all conditions set forth in this waiver.
+  </p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="bg-gold text-black px-6 py-2 rounded-md font-semibold hover:bg-yellow-300 transition">
+      I Agree & Continue
+    </button>
+  </form>
+</div>
+{% endblock %}
