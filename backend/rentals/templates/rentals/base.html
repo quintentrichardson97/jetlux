@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JetLux — Premium Water Rentals</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#E5C07B',
+            dark: '#0D0D0D',
+            charcoal: '#1E1E1E',
+            mist: '#F4F4F4',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['"Playfair Display"', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+</head>
+
+<body class="bg-charcoal text-mist font-sans">
+
+<nav class="bg-charcoal/90 backdrop-blur border-b border-gray-800 sticky top-0 z-50 shadow-md" data-aos="fade-down">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 justify-between">
+      <div class="flex">
+        <div class="mr-2 -ml-2 flex items-center md:hidden">
+          <button type="button" id="menu-toggle" aria-controls="mobile-menu" aria-expanded="false" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-gold focus:outline-none focus:ring-inset">
+            <span class="sr-only">Open main menu</span>
+            <svg class="block size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="flex items-center">
+          <a href="/" class="text-2xl font-heading text-white">JetLux</a>
+        </div>
+        <div class="hidden md:ml-6 md:flex md:space-x-8">
+          <a href="{% url 'jetski_list' %}" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-white hover:border-gold hover:text-gold">Jet Skis</a>
+          <a href="{% url 'booking' %}" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-white hover:border-gold hover:text-gold">Book Now</a>
+          <a href="{% url 'buddy_selection' %}" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-white hover:border-gold hover:text-gold">Buddies</a>
+          <a href="{% url 'home' %}#reviews" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-white hover:border-gold hover:text-gold">Reviews</a>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        {% if user.is_authenticated %}
+        <div class="relative flex items-center space-x-3 group"></div>
+          <a href="{% url 'profile' %}" class="flex items-center space-x-3 px-3 py-1 rounded-full bg-charcoal hover:bg-gold/10 transition-colors duration-200 shadow-sm md:border md:border-gold/30 group">
+            {% if user.profile_picture %}
+              <img class="h-9 w-9 rounded-full object-cover border-2 border-gold shadow group-hover:scale-105 transition-transform duration-200" src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
+            {% else %}
+              <img class="h-9 w-9 rounded-full object-cover border-2 border-gold shadow group-hover:scale-105 transition-transform duration-200" src="{% static 'images/Default_pfp.jpg' %}" alt="{{ user.username }}">
+            {% endif %}
+            <span class="text-white text-sm font-semibold hidden sm:inline group-hover:text-gold transition-colors duration-200">
+              {{ user.get_full_name|default:user.username }}
+            </span>
+          </a>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="text-sm text-white hover:text-gold">Login</a>
+        <a href="{% url 'register' %}" class="text-sm text-white hover:text-gold">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-3 bg-charcoal">
+    <a href="{% url 'jetski_list' %}" class="block py-2 text-white hover:text-gold">Jet Skis</a>
+    <a href="{% url 'booking' %}" class="block py-2 text-white hover:text-gold">Book Now</a>
+    <a href="{% url 'buddy_selection' %}" class="block py-2 text-white hover:text-gold">Buddies</a>
+    <a href="{% url 'home' %}#reviews" class="block py-2 text-white hover:text-gold">Reviews</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'profile' %}" class="block py-2 text-white hover:text-gold">Profile</a>
+      <a href="{% url 'logout' %}" class="block py-2 text-white hover:text-gold">Logout</a>
+    {% else %}
+      <a href="{% url 'login' %}" class="block py-2 text-white hover:text-gold">Login</a>
+      <a href="{% url 'register' %}" class="block py-2 text-white hover:text-gold">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% if request.resolver_match.url_name == 'home' %}
+<div class="relative h-screen w-full overflow-hidden" data-aos="fade-up">
+  <video autoplay loop muted playsinline class="absolute inset-0 h-full w-full object-cover z-0">
+    <source src="{% static 'videos/booking_bg.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="absolute inset-0 bg-black bg-opacity-60 z-10"></div>
+  <div class="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-6">
+    <h1 class="text-4xl sm:text-6xl font-extrabold mb-6 drop-shadow-lg">Premium Water Vehicle Rentals</h1>
+    <p class="max-w-2xl text-lg sm:text-xl mb-8 drop-shadow">Experience the thrill on the water with top-tier equipment and unbeatable views.</p>
+    <a href="{% url 'booking' %}" class="inline-block bg-orange-600 text-white hover:bg-yellow font-semibold py-3 px-6 rounded-md text-lg shadow">Book Now</a>
+  </div>
+</div>
+{% endif %}
+
+<section class="">
+  {% block content %}{% endblock %}
+</section>
+
+<section class="bg-charcoal py-12">
+  <div class="max-w-4xl mx-auto text-center px-4">
+    <h2 class="text-2xl font-heading text-white mb-4">Get in Touch</h2>
+    <p class="text-gray-400 mb-2">Questions? Planning a trip?</p>
+    <p class="text-gray-300">📧 <a href="mailto:charles.giet@charliesjetskirentals.com" class="text-gold hover:underline">support@jetlux.ai</a></p>
+    <p class="text-gray-300">📞 <a href="tel:8134443746" class="text-gold hover:underline">(813) 444-3746</a></p>
+  </div>
+</section>
+
+<footer class="bg-dark border-t border-gray-700 py-6 text-center text-sm text-gray-500">
+  <p>&copy; 2025 JetLux • Tampa, Florida</p>
+  <p class="mt-1">Luxury on the water starts here 🌊</p>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 700,
+    once: true,
+    easing: 'ease-out-cubic',
+    
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (toggleBtn && mobileMenu) {
+      toggleBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+
+    const locationInput = document.getElementById('location');
+    if (locationInput) {
+      const autocomplete = new google.maps.places.Autocomplete(locationInput, {
+        types: ['(cities)'],
+        componentRestrictions: { country: "us" }
+      });
+
+      locationInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && document.querySelector('.pac-item')) {
+          e.preventDefault();
+        }
+      });
+    }
+  });
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

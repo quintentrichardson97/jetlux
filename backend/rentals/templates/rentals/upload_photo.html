@@ -1,0 +1,51 @@
+{% extends "rentals/base.html" %}
+{% block title %}{{ photo_type|title }} Photo Upload{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
+  <h2 class="text-2xl font-bold mb-4 text-center">
+    Upload {{ photo_type|title }} Photo for {{ rental.jet_ski_type }}
+  </h2>
+
+  <p class="text-sm text-gray-500 text-center mb-4">
+    {% if photo_type == 'checkin' %}
+      Please upload at least 4 photos showing all sides of the jet ski <strong>before</strong> your rental starts.
+    {% else %}
+      Please upload at least 4 photos showing all sides of the jet ski <strong>after</strong> your rental ends.
+    {% endif %}
+  </p>
+
+  <form method="POST" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+      <input type="file" name="image" required class="w-full border border-gray-300 rounded p-2" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Caption (optional)</label>
+      {{ form.caption }}
+    </div>
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-semibold">
+      Upload Photo
+    </button>
+  </form>
+
+  {% if rental.photos.filter(photo_type=photo_type) %}
+    <div class="mt-6">
+      <h3 class="text-md font-semibold text-gray-700 mb-2 text-center">
+        Your {{ photo_type }} Photos for This Rental
+      </h3>
+      <div class="flex flex-wrap gap-4 justify-center">
+        {% for photo in rental.photos.filter(photo_type=photo_type) %}
+          <div class="w-28">
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="rounded shadow h-32 w-28 object-cover mb-1">
+            <p class="text-xs text-center truncate">{{ photo.caption }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <a href="{% url 'profile' %}" class="text-blue-500 text-sm block mt-4 text-center">Back to Profile</a>
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "rentals/base.html" %}
+{% load form_filters static %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-8 text-center text-white">Welcome, {{ user.username }}!</h1>
+
+<div class="flex flex-col lg:flex-row lg:space-x-10 px-4 justify-center">
+  <!-- Profile Card -->
+  <div class="bg-charcoal border border-gray-700 text-white rounded-2xl shadow-xl transition duration-300 p-6 w-full lg:w-[24rem] mt-10 lg:mt-0 flex-shrink-0"
+       style="max-width: 24rem;">
+    {% if user.profile_picture %}
+      <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s picture"
+           class="w-28 h-28 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+    {% else %}
+      <img src="{% static 'images/Default_pfp.jpg' %}" alt="Default"
+           class="w-28 h-28 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+    {% endif %}
+
+    <h3 class="text-2xl font-semibold mb-1 text-center">{{ user.username }}</h3>
+    <p class="text-sm italic text-gray-400 text-center mb-4">“{{ user.bio|default:"No bio provided." }}”</p>
+
+    <div class="text-sm space-y-2">
+      {% if user.is_ski_buddy and buddy_profile %}
+        <p><span class="font-semibold text-gold">⭐ Rating:</span> {{ buddy_profile.rating }}</p>
+        <p><span class="font-semibold text-gold">🎯 Experience:</span> {{ buddy_profile.experience_level }}</p>
+        <p><span class="font-semibold text-gold">📅 Availability:</span> {{ buddy_profile.availability }}</p>
+      {% endif %}
+    </div>
+
+    <div class="mt-6 space-y-3 text-center">
+      <a href="{% url 'edit_profile' %}" class="inline-block text-gold hover:text-yellow-300 font-medium">
+         Edit Profile
+      </a>
+      {% if user.is_affiliate %}
+        <a href="{% url 'inventory' %}" class="block text-blue-400 hover:text-blue-300 font-medium">
+           Inventory
+        </a>
+        <a href="{% url 'add_vehicle' %}" class="block text-green-400 hover:text-green-300 font-medium">
+           Add Vehicle
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Calendar Section -->
+  <div class="w-full lg:w-1/2 pt-7 flex flex-col items-center">
+    <h2 class="text-xl font-semibold mb-4 text-center lg:text-left text-white">Your Upcoming Appointments</h2>
+    <div class="shadow rounded-lg p-2 text-sm w-full max-w-md bg-zinc-900 border border-zinc-600 overflow-hidden"
+     style="height: 28rem; display: flex; flex-direction: column;">
+      <div id="calendar" style="flex: 1 1 auto; min-height: 0;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Rental Photo Logs -->
+<div class="mt-16 px-6 max-w-5xl mx-auto text-white pt-4">
+  <h2 class="text-2xl font-semibold mb-6 text-center">📂 Rental Photo Logs</h2>
+
+  {% if user.rental_set.all %}
+    {% for rental in user.rental_set.all %}
+      <div class="mb-8 bg-gray-800 p-4 rounded-xl shadow border border-gray-700">
+        <h3 class="text-md font-bold text-gray-200 mb-2">
+          {{ rental.jet_ski_type }} — {{ rental.start_time|date:"M d, Y H:i" }} to {{ rental.end_time|date:"H:i" }}
+        </h3>
+
+        {% for ptype in photo_types %}
+          {% with photos=rental_photos|get_item:rental.id|get_item:ptype %}
+            {% if photos %}
+              <h4 class="text-sm font-medium text-gray-400 mt-3 capitalize">{{ ptype }} Photos</h4>
+              <div class="flex flex-wrap gap-3 mt-2">
+                {% for photo in photos %}
+                  <div class="w-20">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="rounded h-20 w-20 object-cover shadow">
+                    <p class="text-xs truncate text-center mt-1">{{ photo.caption }}</p>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-gray-400 text-sm text-center">No photos uploaded yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<style>
+  /* Calendar Dark Mode Styling */
+  .fc {
+    background-color: #111827 !important;
+    color: #f1f5f9 !important;
+  }
+  .fc-daygrid-day-number, .fc-col-header-cell-cushion {
+    color: #e5e7eb !important;
+  }
+  .fc-toolbar-title {
+    color: #f9fafb !important;
+  }
+  .fc-button {
+    background-color: #4b5563 !important;
+    color: white !important;
+    border: none;
+  }
+  .fc-button:hover {
+    background-color: #6b7280 !important;
+  }
+  .fc-daygrid-day.fc-day-today {
+    background-color: rgba(253, 224, 71, 0.15) !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      events: '/calendar/events/?own=true',
+      timeZone: 'local',
+      height: "100%",
+      contentHeight: 'auto',
+      eventDidMount: function (info) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'absolute z-50 bg-black text-white text-xs rounded py-2 px-3 shadow-md';
+        tooltip.style.display = 'none';
+        tooltip.style.position = 'absolute';
+
+        const start = new Date(info.event.start);
+        const end = new Date(info.event.end);
+        const formatTime = (date) =>
+          date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        tooltip.innerHTML = `
+          <div><strong>${info.event.title}</strong></div>
+          <div>${formatTime(start)} – ${formatTime(end)}</div>
+        `;
+
+        document.body.appendChild(tooltip);
+
+        info.el.addEventListener('mouseenter', (e) => {
+          tooltip.style.left = e.pageX + 'px';
+          tooltip.style.top = e.pageY + 'px';
+          tooltip.style.display = 'block';
+        });
+
+        info.el.addEventListener('mousemove', (e) => {
+          tooltip.style.left = e.pageX + 10 + 'px';
+          tooltip.style.top = e.pageY + 10 + 'px';
+        });
+
+        info.el.addEventListener('mouseleave', () => {
+          tooltip.style.display = 'none';
+        });
+      }
+    });
+
+    setTimeout(() => {
+      calendar.render();
+    }, 50);
+  });
+</script>
+{% endblock %}
+
+

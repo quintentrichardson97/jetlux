@@ -1,0 +1,104 @@
+{% extends "rentals/base.html" %}
+{% load form_filters %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-dark px-4 sm:px-6 lg:px-8 py-12">
+  <div class="w-full max-w-md bg-charcoal text-mist rounded-xl shadow-xl p-6 sm:p-8 space-y-6">
+    <h2 class="text-center text-3xl font-heading text-white">Create an Account</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-5" id="registrationForm">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      {% for field in form %}
+        {% if field.name not in "business_name license_number availability experience_level buddy_bio rate_per_hour is_ski_buddy is_affiliate" %}
+          <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">{{ field.label }}</label>
+            {{ field|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+            {% if field.help_text %}
+              <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+              <p class="text-sm text-red-400 mt-1">{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Role Checkboxes -->
+      <div class="flex items-center gap-3">
+        <input type="checkbox" name="is_ski_buddy" id="id_is_ski_buddy" class="h-5 w-5 text-gold bg-gray-800 border-gray-600 rounded focus:ring-gold" {% if form.is_ski_buddy.value %}checked{% endif %}>
+        <label for="id_is_ski_buddy" class="text-sm text-gray-200 font-medium">Register as a Ski Buddy</label>
+      </div>
+      <p class="text-xs text-gray-400 mb-2 sm:ml-8">Offer your services as a buddy.</p>
+
+      <div class="flex items-center gap-3">
+        <input type="checkbox" name="is_affiliate" id="id_is_affiliate" class="h-5 w-5 text-gold bg-gray-800 border-gray-600 rounded focus:ring-gold" {% if form.is_affiliate.value %}checked{% endif %}>
+        <label for="id_is_affiliate" class="text-sm text-gray-200 font-medium">Register as an Affiliate</label>
+      </div>
+      <p class="text-xs text-gray-400 mb-4 sm:ml-8">List your own jet skis or boats for rent.</p>
+
+      <!-- Affiliate Fields -->
+      <div id="affiliateFields" class="space-y-4 hidden">
+        <div>
+          <label for="{{ form.business_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Business Name</label>
+          {{ form.business_name|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+        <div>
+          <label for="{{ form.license_number.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">License Number</label>
+          {{ form.license_number|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+      </div>
+
+      <!-- Ski Buddy Fields -->
+      <div id="skiBuddyFields" class="space-y-4 hidden">
+        <div>
+          <label for="{{ form.availability.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Availability</label>
+          {{ form.availability|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+        <div>
+          <label for="{{ form.experience_level.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Experience Level</label>
+          {{ form.experience_level|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+        <div>
+          <label for="{{ form.buddy_bio.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Buddy Bio</label>
+          {{ form.buddy_bio|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+        <div>
+          <label for="{{ form.rate_per_hour.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Rate per Hour ($)</label>
+          {{ form.rate_per_hour|add_class:"w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold" }}
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-gold hover:bg-yellow-400 text-black font-semibold py-2 rounded-lg transition duration-200">
+        Register
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-400">
+      Already have an account?
+      <a href="{% url 'login' %}" class="text-gold hover:underline">Login here</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  const skiBuddyCheckbox = document.getElementById('id_is_ski_buddy');
+  const affiliateCheckbox = document.getElementById('id_is_affiliate');
+  const skiBuddyFields = document.getElementById('skiBuddyFields');
+  const affiliateFields = document.getElementById('affiliateFields');
+
+  function toggleFields() {
+    skiBuddyFields.style.display = skiBuddyCheckbox?.checked ? 'block' : 'none';
+    affiliateFields.style.display = affiliateCheckbox?.checked ? 'block' : 'none';
+  }
+
+  skiBuddyCheckbox?.addEventListener('change', toggleFields);
+  affiliateCheckbox?.addEventListener('change', toggleFields);
+  window.addEventListener('DOMContentLoaded', toggleFields);
+</script>
+{% endblock %}
+
+
+

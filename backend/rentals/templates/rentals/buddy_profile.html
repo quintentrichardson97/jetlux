@@ -1,0 +1,80 @@
+{% extends "rentals/base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6 text-center">Meet {{ buddy_user.username }}!</h1>
+
+<div class="flex flex-col lg:flex-row lg:space-x-10 px-4 justify-center">
+  <!-- Calendar Placeholder -->
+  <div class="w-full lg:w-1/2">
+    <h2 class="text-xl font-semibold mb-4 text-center lg:text-left">Buddy’s Public Schedule</h2>
+    <div class="shadow rounded bg-white p-2 text-sm max-w-full h-[28rem] flex items-center justify-center text-gray-500 italic">
+      Calendar not shown on public profile.
+    </div>
+  </div>
+
+  <!-- Profile Card with Gallery -->
+  <div class="bg-white border border-gray-200 rounded-2xl shadow-md transition duration-300 p-6 text-center w-full lg:w-[24rem] mt-8 lg:mt-0">
+    {% if buddy_profile and buddy_profile.user_picture %}
+      <img src="{{ buddy_profile.user_picture.url }}" alt="{{ buddy_user.username }}'s picture"
+           class="w-28 h-28 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+    {% else %}
+      <img src="/media/buddy_images/default.jpg" alt="Default"
+           class="w-28 h-28 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+    {% endif %}
+
+    <h3 class="text-xl font-semibold text-deepnavy mb-1">{{ buddy_user.username }}</h3>
+    {% if buddy_profile %}
+      <p class="text-sm text-gray-600 italic mb-4">“{{ buddy_profile.buddy_bio|default:"No profile"|truncatechars:80 }}”</p>
+    {% else %}
+      <p class="text-sm text-gray-600 italic mb-4">“{{ buddy_user.bio|default:"No bio" }}”</p>
+    {% endif %}
+
+    <div class="text-left text-sm text-gray-700 space-y-1">
+      {% if buddy_user.is_ski_buddy and buddy_profile %}
+        <p><strong>⭐ Rating:</strong> {{ buddy_profile.rating }}</p>
+        <p><strong>🎯 Experience:</strong> {{ buddy_profile.experience_level }}</p>
+        <p><strong>📅 Availability:</strong> {{ buddy_profile.availability }}</p>
+      {% endif %}
+      <p><strong>📧 Email:</strong> {{ buddy_user.email }}</p>
+      <p><strong>📝 User Bio:</strong> {{ buddy_user.bio }}</p>
+    </div>
+
+    <!-- No edit link on public profile -->
+
+    <!-- Photo Gallery Carousel -->
+    <div class="mt-6">
+      <h4 class="text-lg font-semibold text-left mb-2">📸 Gallery</h4>
+
+      {% if buddy_user.photos.all %}
+        <div class="relative">
+          <div id="photoCarousel" class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory space-x-4 pb-2">
+            {% for photo in buddy_user.photos.all %}
+              <img src="{{ photo.image.url }}" alt="{{ photo.caption }}"
+                   class="snap-start w-32 h-52 object-cover rounded-lg border border-gray-300 shadow-sm flex-shrink-0">
+            {% endfor %}
+          </div>
+
+          <button onclick="scrollGallery(-1)"
+                  class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/90 text-gray-800 px-2 py-1 rounded-r shadow hover:bg-white">
+            ❮
+          </button>
+          <button onclick="scrollGallery(1)"
+                  class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/90 text-gray-800 px-2 py-1 rounded-l shadow hover:bg-white">
+            ❯
+          </button>
+        </div>
+      {% else %}
+        <p class="text-gray-500 text-sm">No photos uploaded.</p>
+      {% endif %}
+    </div>
+
+    <script>
+      function scrollGallery(direction) {
+        const container = document.getElementById('photoCarousel');
+        const scrollAmount = 150;
+        container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+      }
+    </script>
+  </div>
+</div>
+{% endblock %}
