@@ -1,0 +1,139 @@
+{% extends "rentals/base.html" %}
+{% block title %}Book a Ride{% endblock %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto flex flex-col gap-10 px-4 py-8">
+  <!-- Booking Form -->
+  <div class="w-full">
+    <div class="bg-charcoal rounded-2xl shadow-xl p-6 space-y-6 border border-gray-700 text-white">
+      <h2 class="text-3xl font-bold mb-2 text-center">Finalize Your Booking</h2>
+      <p class="text-center text-sm text-gray-300">You already explored availability — now lock it in below.</p>
+
+      <form id="booking-form" method="post" action="{% url 'process_booking' %}" class="space-y-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.vehicle.label }}</label>
+          {{ form.vehicle|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.buddy.label }}</label>
+          {{ form.buddy|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.start_time.label }}</label>
+          {{ form.start_time|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.duration.label }}</label>
+          {{ form.duration|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.end_time.label }}</label>
+          {{ form.end_time|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-200 mb-1">{{ form.promo_code.label }}</label>
+          {{ form.promo_code|add_class:"w-full p-2 rounded bg-gray-900 border border-gray-600 text-white placeholder-gray-400 shadow-sm" }}
+        </div>
+
+        <button type="submit" class="w-full bg-gold text-black font-semibold py-2 rounded hover:bg-yellow-400 transition">
+          Book Now
+        </button>
+      </form>
+
+      <!-- Upcoming Bookings -->
+      <div class="mt-10">
+        <h3 class="text-xl font-bold mb-3 text-white">Your Upcoming Bookings</h3>
+
+        {% if upcoming_rentals %}
+          <ul class="space-y-2 text-sm text-gray-200">
+            {% for rental in upcoming_rentals %}
+              <li class="p-2 bg-gray-800 rounded shadow-sm border border-gray-600">
+                {{ rental.vehicle.name }} — {{ rental.start_time|date:"M d" }}
+                ({{ rental.start_time|time:"h:i A" }} - {{ rental.end_time|time:"h:i A" }})
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-gray-400">No rentals yet.</p>
+        {% endif %}
+
+        {% if upcoming_appointments %}
+          <ul class="mt-4 space-y-2 text-sm text-gray-200">
+            {% for appointment in upcoming_appointments %}
+              <li class="p-2 bg-gray-800 rounded shadow-sm border border-gray-600">
+                {{ appointment.buddy }} — {{ appointment.start_time|date:"M d" }}
+                ({{ appointment.start_time|time:"h:i A" }} - {{ appointment.end_time|time:"h:i A" }})
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-gray-400 mt-2">No appointments scheduled.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const startInput = document.querySelector('input[name="start_time"]');
+    const durationInput = document.querySelector('input[name="duration"]');
+    const endInput = document.querySelector('input[name="end_time"]');
+    const vehicleSelect = document.querySelector('select[name="vehicle"]');
+    const buddySelect = document.querySelector('select[name="buddy"]');
+    const totalInput = document.createElement('input');
+    totalInput.type = 'hidden';
+    totalInput.name = 'calculated_total';
+    document.getElementById('booking-form').appendChild(totalInput);
+
+    const vehicleRates = JSON.parse('{{ vehicle_rates_json|escapejs }}');  // e.g., {1: 100, 2: 150}
+    const buddyRates = JSON.parse('{{ buddy_rates_json|escapejs }}');      // e.g., {3: 40, 4: 50}
+
+    function updateEndTime() {
+      const startVal = new Date(startInput.value);
+      const hours = parseFloat(durationInput.value || 0);
+      if (!isNaN(startVal.getTime()) && hours > 0) {
+        const endTime = new Date(startVal.getTime() + hours * 60 * 60 * 1000);
+        endInput.value = endTime.toISOString().slice(0, 16);
+      }
+    }
+
+    function updateTotal() {
+      const hours = parseFloat(durationInput.value || 0);
+      const vehicleId = vehicleSelect.value;
+      const buddyId = buddySelect.value;
+
+      const vehicleRate = vehicleRates[vehicleId] || 0;
+      const buddyRate = buddyRates[buddyId] || 0;
+
+      const total = (vehicleRate + buddyRate) * hours;
+      totalInput.value = total.toFixed(2);
+    }
+
+    startInput.addEventListener('change', updateEndTime);
+    durationInput.addEventListener('input', () => {
+      updateEndTime();
+      updateTotal();
+    });
+    vehicleSelect.addEventListener('change', updateTotal);
+    buddySelect.addEventListener('change', updateTotal);
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+

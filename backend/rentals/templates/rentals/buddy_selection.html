@@ -1,0 +1,33 @@
+{% extends "rentals/base.html" %}
+
+{% block content %}
+<h2 class="text-4xl font-bold text-center text-deepnavy mb-10">Meet Our Top Ski Buddies</h2>
+
+<div class="flex flex-wrap justify-center gap-8">
+  {% for buddy in buddies %}
+   <a href="{% url 'buddy_profile' username=buddy.user.username %}" class="block">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 text-center w-80">
+      
+      {% if buddy.user_picture %}
+        <img src="{{ buddy.user_picture.url }}" alt="{{ buddy.user.username }}'s picture"
+             class="w-32 h-32 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+      {% else %}
+        <img src="/media/buddy_images/default.jpg" alt="Default"
+             class="w-32 h-32 object-cover rounded-full mx-auto mb-4 ring-2 ring-gold">
+      {% endif %}
+
+      <h3 class="text-xl font-semibold text-deepnavy mb-1">{{ buddy.user.username }}</h3>
+      <p class="text-sm text-gray-600 italic mb-4">“{{ buddy.buddy_bio|truncatechars:80 }}”</p>
+
+      <div class="text-left text-sm text-gray-700 space-y-1">
+        <p><strong>⭐ Rating:</strong> {{ buddy.rating }}</p>
+        <p><strong>🎯 Experience:</strong> {{ buddy.experience_level }}</p>
+        <p><strong>📅 Availability:</strong> {{ buddy.availability }}</p>
+      </div>
+    </div>
+  </a>
+  {% empty %}
+    <p class="text-center w-full text-gray-500">No ski buddies available at the moment.</p>
+  {% endfor %}
+</div>
+{% endblock %}

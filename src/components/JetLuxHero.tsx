@@ -12,9 +12,9 @@ export function JetLuxHero() {
       />
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white px-4">
-        <h1 className="text-4xl font-bold sm:text-5xl">Premium Water Vehicle Rentals</h1>
+        <h1 className="text-4xl font-bold sm:text-5xl"><span> Rent. Ride. Host.</span><br /> <span>Your Premium Water Adventure Starts Here.</span></h1>
         <p className="mt-4 max-w-xl text-lg">
-          Experience the thrill on the water with top-tier equipment and unbeatable views.
+          Explore premium watercraft, ride with expert ski buddies, or earn by listing your own — all on one seamless platform.
         </p>
         <Button href="/booking" color="cyan" className="mt-6">
           Book Now

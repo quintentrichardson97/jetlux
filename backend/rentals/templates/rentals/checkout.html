@@ -1,0 +1,141 @@
+{% extends "rentals/base.html" %}
+
+{% block title %}Checkout - Charlie's Jet Ski Rentals{% endblock %}
+
+{% block content %}
+<div class="sm:w-[28rem] mx-auto mt-16 px-4 py-8 bg-white rounded-lg shadow-md text-center">
+  <h2 class="text-2xl font-bold mb-4 text-gray-900">Complete Your Payment</h2>
+  <p class="text-gray-600 mb-6">
+    Total: <strong>${{ total_amount_display }}</strong><br>
+    Use Apple Pay, Google Pay, PayPal, or card.
+  </p>
+
+  <!-- Stripe Payment Request Button Container -->
+  <div id="payment-request-button" class="mb-6"></div>
+
+  <!-- PayPal Button Container -->
+  <div id="paypal-button-container" class="mb-6"></div>
+
+  <!-- Stripe Manual Checkout Button -->
+  <button id="manual-stripe-checkout"
+          class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition hidden">
+    Pay with Card (Stripe)
+  </button>
+
+  <!-- Fallback Message -->
+  <p id="no-wallet-message" class="text-sm text-gray-500 hidden">
+    Apple Pay is only available through Stripe on supported devices and browsers.
+  </p>
+</div>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe("{{ stripe_public_key }}");
+
+  const paymentRequest = stripe.paymentRequest({
+    country: 'US',
+    currency: 'usd',
+    total: {
+      label: "Jet Ski Rental",
+      amount: "{{ total_amount_cents }}",
+    },
+    requestPayerName: true,
+    requestPayerEmail: true
+  });
+
+  const elements = stripe.elements();
+  const prButton = elements.create('paymentRequestButton', {
+    paymentRequest: paymentRequest,
+  });
+
+  paymentRequest.canMakePayment().then(result => {
+    if (result) {
+      prButton.mount('#payment-request-button');
+    } else {
+      document.getElementById('payment-request-button').style.display = 'none';
+      document.getElementById('no-wallet-message').classList.remove('hidden');
+      document.getElementById('manual-stripe-checkout').classList.remove('hidden');
+    }
+  });
+
+  paymentRequest.on('paymentmethod', async (ev) => {
+    const response = await fetch("{% url 'create_payment_intent' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ amount: "{{ total_amount_cents }}" })
+    });
+
+    const { clientSecret, error: backendError } = await response.json();
+
+    const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      { payment_method: ev.paymentMethod.id },
+      { handleActions: false }
+    );
+
+    if (stripeError || backendError) {
+      ev.complete('fail');
+    } else {
+      ev.complete('success');
+      if (paymentIntent.status === 'requires_action') {
+        await stripe.confirmCardPayment(clientSecret);
+      }
+      window.location.href = "/?success=true";
+    }
+  });
+
+  document.getElementById("manual-stripe-checkout").addEventListener("click", () => {
+    fetch("{% url 'create_checkout_session' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ amount: "{{ total_amount_cents }}" })
+    })
+    .then(response => response.json())
+    .then(session => {
+      if (session.id) {
+        return stripe.redirectToCheckout({ sessionId: session.id });
+      } else {
+        alert("Stripe checkout failed.");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("An error occurred.");
+    });
+  });
+</script>
+
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+<script>
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: { value: '{{ total_amount_display }}' }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert('Transaction completed by ' + details.payer.name.given_name);
+        window.location.href = "/?success=true";
+      });
+    },
+    onCancel: function(data) {
+      window.location.href = "/?canceled=true";
+    },
+    onError: function(err) {
+      console.error(err);
+      alert('Payment failed. Try again.');
+    }
+  }).render('#paypal-button-container');
+</script>
+{% endblock %}
