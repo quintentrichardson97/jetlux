@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-
 @plugin '@tailwindcss/forms';
 
 @theme {
@@ -41,31 +40,32 @@
   --radius-4xl: 2rem;
   --radius-5xl: 2.5rem;
 
-  --color-gray-50: #f8fafc;
-  --color-gray-100: #f1f5f9;
-  --color-gray-200: #e2e8f0;
-  --color-gray-300: #cbd5e1;
-  --color-gray-400: #94a3b8;
-  --color-gray-500: #64748b;
-  --color-gray-600: #475569;
-  --color-gray-700: #334155;
-  --color-gray-800: #1e293b;
-  --color-gray-900: #0f172a;
-  --color-gray-950: #0b1120;
-  --color-cyan-50: #fffbeb;
-  --color-cyan-100: #fef3c7;
-  --color-cyan-200: #fde68a;
-  --color-cyan-300: #fcd34d;
-  --color-cyan-400: #fbbf24;
-  --color-cyan-500: #f59e0b;
-  --color-cyan-600: #d97706;
-  --color-cyan-700: #b45309;
-  --color-cyan-800: #92400e;
-  --color-cyan-900: #78350f;
-  --color-cyan-950: #451a03;
+  /* Final merged color palette */
+  --color-gray-50: #f2f4f5;
+  --color-gray-100: #e5e7ea;
+  --color-gray-200: #ccd1d6;
+  --color-gray-300: #b3bcc2;
+  --color-gray-400: #7d838b;
+  --color-gray-500: #545c64;
+  --color-gray-600: #434a53;
+  --color-gray-700: #2c333c;
+  --color-gray-800: #1c222b;
+  --color-gray-900: #0c111a;
+  --color-gray-950: #05080e;
+
+  --color-cyan-50: #fffbea;
+  --color-cyan-100: #fdf2c1;
+  --color-cyan-200: #fce69a;
+  --color-cyan-300: #f9d66c;
+  --color-cyan-400: #f6c646;
+  --color-cyan-500: #f3b621;
+  --color-cyan-600: #d59818;
+  --color-cyan-700: #b87a10;
+  --color-cyan-800: #9b5d0a;
+  --color-cyan-900: #7b4506;
+  --color-cyan-950: #402304;
 
   --font-sans: var(--font-inter);
-
   --container-2xl: 40rem;
 
   @keyframes fade-in {
@@ -76,6 +76,7 @@
       opacity: 1;
     }
   }
+
   @keyframes spin-reverse {
     to {
       transform: rotate(-360deg);
