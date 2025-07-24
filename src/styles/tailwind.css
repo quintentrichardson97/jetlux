@@ -40,7 +40,6 @@
   --radius-4xl: 2rem;
   --radius-5xl: 2.5rem;
 
-  /* Final merged color palette */
   --color-gray-50: #f2f4f5;
   --color-gray-100: #e5e7ea;
   --color-gray-200: #ccd1d6;
@@ -93,3 +92,4 @@
     }
   }
 }
+
