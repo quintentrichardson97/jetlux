@@ -6,14 +6,15 @@ import { useInView } from 'framer-motion'
 
 import { Container } from '@/components/Container'
 
-interface Review {
+export interface Review {
   title: string
   body: string
   author: string
   rating: 1 | 2 | 3 | 4 | 5
 }
 
-const reviews: Array<Review> = [
+/* Example reviews used previously. */
+const placeholderReviews: Array<Review> = [
   {
     title: 'It really works.',
     body: 'I downloaded Pocket today and turned $5000 into $25,000 in half an hour.',
@@ -223,7 +224,7 @@ function ReviewColumn({
   )
 }
 
-function ReviewGrid() {
+function ReviewGrid({ reviews }: { reviews: Array<Review> }) {
   let containerRef = useRef<React.ElementRef<'div'>>(null)
   let isInView = useInView(containerRef, { once: true, amount: 0.4 })
   let columns = splitArray(reviews, 3)
@@ -270,7 +271,7 @@ function ReviewGrid() {
   )
 }
 
-export function Reviews() {
+export function Reviews({ reviews = placeholderReviews }: { reviews?: Array<Review> }) {
   return (
     <section
       id="reviews"
@@ -284,7 +285,7 @@ export function Reviews() {
         >
           Customer Reviews – What People Are Saying
         </h2>
-        <ReviewGrid />
+        <ReviewGrid reviews={reviews} />
       </Container>
     </section>
   )
