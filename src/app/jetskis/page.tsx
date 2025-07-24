@@ -19,6 +19,7 @@ interface Vehicle {
 
 export default async function JetSkisPage() {
   const skis = await getJSON<Vehicle[]>('/api/vehicles/')
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
       <h1 className="text-3xl font-semibold">Jet Skis</h1>
@@ -26,7 +27,13 @@ export default async function JetSkisPage() {
         {skis.map((ski) => (
           <li key={ski.id} className="rounded-lg border p-4">
             {ski.image ? (
-              <Image src={ski.image} alt="" width={320} height={160} className="mb-4 h-40 w-full object-cover" />
+              <Image
+                src={ski.image}
+                alt=""
+                width={320}
+                height={160}
+                className="mb-4 h-40 w-full object-cover"
+              />
             ) : (
               <div className="mb-4 h-40 bg-gray-200" />
             )}
